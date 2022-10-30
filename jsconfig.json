@@ -3,11 +3,12 @@
     "target": "es5",
     "module": "esnext",
     "baseUrl": "./",
+    "preserveWhitespace": false,
     "moduleResolution": "node",
     "paths": {
       "@/*": [
         "src/*"
-      ]
+      ],
     },
     "lib": [
       "esnext",
