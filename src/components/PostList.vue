@@ -3,8 +3,8 @@
       <h3>Список постов:</h3>
       <transition-group name="user-list">
         <post-item 
-          :post="post" v-for="post in posts" 
-          :key="post.id" 
+          :post="post" v-for="(post, key) in posts"  
+          :key = 'key'
           @remove="$emit('remove', post)" />
       </transition-group>
     </div>
