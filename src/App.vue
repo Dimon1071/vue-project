@@ -19,15 +19,16 @@
       <div v-else>Идет загрузка...</div>
 
       <div class="page__wrapper">
-        <div v-for="pageNumber in totalPages"
+        <button v-for="pageNumber in totalPages"
           :key="pageNumber"
           class="page"
           :class="{
             'current-page': page === pageNumber
           }"
+          @click="changePage(pageNumber)"
          >
           {{ pageNumber }}
-        </div>
+        </button>
       </div>
   </div>
 </template>
@@ -84,6 +85,9 @@
         } finally {
           this.isPostsLoading = false;
         }
+      },
+      changePage(pageNumber) {
+        this.page = pageNumber
       }
     },
     mounted() {
@@ -95,6 +99,11 @@
       },
       sortedAndSearchedPosts() {
         return this.sortedPosts.filter(post => post.title.includes(this.searchQuery))
+      }
+    },
+    watch: {
+      page() {
+        this.fetchPosts()
       }
     }
   }
