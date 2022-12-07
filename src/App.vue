@@ -18,7 +18,9 @@
       <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostsLoading" />
       <div v-else>Идет загрузка...</div>
 
-      <div class="page__wrapper">
+      <div ref="observer" class="observe"></div>
+
+      <!-- <div class="page__wrapper">
         <button v-for="pageNumber in totalPages"
           :key="pageNumber"
           class="page"
@@ -29,7 +31,7 @@
          >
           {{ pageNumber }}
         </button>
-      </div>
+      </div> -->
   </div>
 </template>
 
@@ -86,12 +88,39 @@
           this.isPostsLoading = false;
         }
       },
-      changePage(pageNumber) {
-        this.page = pageNumber
-      }
+      async loadMorePosts() {
+        try {
+            this.page += 1;
+            const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+              params: {
+                _page: this.page,
+                _limit: this.limit
+              }
+            })
+            this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
+            this.posts = [...this.posts, ...response.data]
+          } catch(e) {
+          alert('Произошла ошибка')
+        } 
+      },
+      // changePage(pageNumber) {
+      //   this.page = pageNumber
+      // }
     },
     mounted() {
       this.fetchPosts();
+      this.$refs.observer
+      let options = {
+        rootMargin: '0px',
+        threshold: 1.0
+      }
+      let callback = entries => {
+        if(entries[0].isIntersecting && this.page < this.totalPages) {
+          this.loadMorePosts()
+        }
+      }
+      let observer = new IntersectionObserver(callback, options);
+      observer.observe(this.$refs.observer);
     },
     computed: {
       sortedPosts() {
@@ -101,11 +130,11 @@
         return this.sortedPosts.filter(post => post.title.includes(this.searchQuery))
       }
     },
-    watch: {
-      page() {
-        this.fetchPosts()
-      }
-    }
+    // watch: {
+    //   page() {
+    //     this.fetchPosts()
+    //   }
+    // }
   }
 </script>
 
@@ -139,6 +168,11 @@
 
   .current-page {
     border: 2px solid teal;
+  }
+
+  .observe {
+    height: 15px;
+    background: green;
   }
 
 </style>
